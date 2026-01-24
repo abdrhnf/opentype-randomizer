@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenType Randomizer (Standalone)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #0f172a;
+            --code-text: #a5f3fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 350px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            overflow-y: auto;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            background: var(--bg);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus,
+        input:focus {
+            border-color: var(--primary);
+            ring: 2px solid var(--primary);
+        }
+
+        textarea {
+            height: 120px;
+            font-family: monospace;
+            resize: none;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .range-badge {
+            background: var(--bg);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .help-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f1f5f9;
+            min-width: 0;
+        }
+
+        .toolbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 60px;
+            display: flex;
+            padding: 0 1.5rem;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            height: 100%;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .editor-container {
+            flex: 1;
+            padding: 1.5rem;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .code-window {
+            background: var(--code-bg);
+            border-radius: 0.75rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-header {
+            background: #020617;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #cbd5e1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+        }
+
+        pre {
+            flex: 1;
+            overflow: auto;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--code-text);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-content {
+            padding: 2rem;
+            overflow-y: auto;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .modal-content h3 {
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                overflow: auto;
+            }
+
+            aside {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            main {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside>
+            <header>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h1>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" text-anchor="middle">
+                            <polyline points="16 3 21 3 21 8"></polyline>
+                            <line x1="4" y1="20" x2="21" y2="3"></line>
+                            <polyline points="21 16 21 21 16 21"></polyline>
+                            <line x1="15" y1="15" x2="21" y2="21"></line>
+                            <line x1="4" y1="4" x2="9" y2="9"></line>
+                        </svg>
+                        Randomizer
+                    </h1>
+                    <button class="tab-btn" onclick="toggleModal(true)" title="Bantuan">?</button>
+                </div>
+                <p class="subtitle">Generator Fitur OpenType Pseudo-Random</p>
+            </header>
+
+            <div>
+                <label>Base Glyphs (Pisahkan spasi)</label>
+                <textarea
+                    id="inputGlyphs">a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z</textarea>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label>Jml Alternates</label>
+                    <input type="number" id="inputAltCount" value="6" min="1" max="20">
+                </div>
+                <div>
+                    <label>Suffix</label>
+                    <input type="text" id="inputSuffix" value=".alt">
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                <div class="range-header">
+                    <span>Frequency (Buckets)</span>
+                    <span class="range-badge" id="valBucket">4</span>
+                </div>
+                <input type="range" id="inputBucket" min="2" max="8" value="4">
+                <p class="help-text">Membagi glyph ke dalam N kelompok acak.</p>
+            </div>
+
+            <div>
+                <div class="range-header">
+                    <span>Lookahead Depth</span>
+                    <span class="range-badge" id="valDepth">3 steps</span>
+                </div>
+                <input type="range" id="inputDepth" min="1" max="4" value="3">
+                <p class="help-text">Kedalaman logika pengacakan.</p>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main>
+            <div class="toolbar">
+                <button class="tab-btn active" onclick="switchTab('classes')" id="btn-classes">1. Classes</button>
+                <button class="tab-btn" onclick="switchTab('calt')" id="btn-calt">2. Logic (calt)</button>
+                <button class="tab-btn" onclick="switchTab('check')" id="btn-check">3. Safety Check</button>
+                <button class="tab-btn" onclick="switchTab('recipe')" id="btn-recipe">4. Recipe</button>
+                <button class="tab-btn" onclick="switchTab('visualizer')" id="btn-visualizer"
+                    style="color:var(--primary);">
+                    <svg class="icon" style="width:16px;height:16px;margin-right:5px;" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Simulate
+                </button>
+                <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+                    <button class="copy-btn" onclick="downloadAll()" title="Download All Features combined">
+                        <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Unduh Semua
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-container">
+                <div class="code-window" id="view-code">
+                    <div class="code-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span id="filename-display">classes.fea</span>
+                            <span id="glyph-count"
+                                style="font-size:0.75rem; color:#64748b; background:#e2e8f0; padding:2px 8px; border-radius:4px;"></span>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <button class="copy-btn" onclick="downloadCode()" title="Download as file">
+                                <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Unduh
+                            </button>
+                            <button class="copy-btn" onclick="copyCode()">
+                                <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Salin
+                            </button>
+                        </div>
+                    </div>
+                    <pre id="output-code">Loading...</pre>
+                </div>
+
+                <!-- Visualizer Window (Hidden by default) -->
+                <div class="code-window" id="view-visualizer" style="display:none; background: #fff;">
+                    <div class="code-header"
+                        style="background:#f1f5f9; color:#334155; border-bottom:1px solid #cbd5e1; flex-direction: column; align-items: start; gap: 10px;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                            <span>Pratinjau Pengacakan Langsung</span>
+                        </div>
+                        <div id="viz-stats"
+                            style="width:100%; font-size:0.75rem; color:#64748b; background:#e2e8f0; padding:4px 8px; border-radius:4px;">
+                            Analisis: Menunggu input...
+                        </div>
+                    </div>
+                    <div
+                        style="padding: 1.5rem; display:flex; flex-direction:column; gap:1.5rem; height:100%; overflow:hidden;">
+                        <div>
+                            <input type="text" id="viz-input" placeholder="Ketik di sini untuk menguji pengacakan..."
+                                style="width:100%; padding:1rem; font-size:1.2rem; border:2px solid #e2e8f0; border-radius:0.5rem;"
+                                value="the quick brown fox jumps over the lazy dog">
+                        </div>
+                        <div id="viz-output"
+                            style="flex:1; border:1px dashed #cbd5e1; border-radius:0.5rem; padding:1.5rem; font-size:2rem; overflow:auto; line-height:1.5;">
+                            <!-- Output goes here -->
+                        </div>
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap; font-size:0.75rem; color:#64748b;">
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Glyph default (tanpa alternate)"><span
+                                    style="width:12px;height:12px;background:#94a3b8;border-radius:2px;"></span> Standar
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 1 (contoh: a.alt1)"><span
+                                    style="width:12px;height:12px;background:#ef4444;border-radius:2px;"></span> Alt 1
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 2 (contoh: a.alt2)"><span
+                                    style="width:12px;height:12px;background:#f97316;border-radius:2px;"></span> Alt 2
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 3 (contoh: a.alt3)"><span
+                                    style="width:12px;height:12px;background:#eab308;border-radius:2px;"></span> Alt 3
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 4 (contoh: a.alt4)"><span
+                                    style="width:12px;height:12px;background:#22c55e;border-radius:2px;"></span> Alt 4
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 5 (contoh: a.alt5)"><span
+                                    style="width:12px;height:12px;background:#06b6d4;border-radius:2px;"></span> Alt 5
+                            </div>
+                            <div style="display:flex; align-items:center; gap:4px; cursor:help;"
+                                title="Alternate 6 atau lebih tinggi"><span
+                                    style="width:12px;height:12px;background:#3b82f6;border-radius:2px;"></span> Alt 6+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Panduan Pengguna</h2>
+                <div style="display:flex; gap:10px;">
+                    <button class="modal-close" onclick="toggleModal(false)">✕</button>
+                </div>
+            </div>
+            <div class="modal-content">
+                <h3>Apa alat ini?</h3>
+                <p>Alat ini membuat kode OpenType otomatis untuk mengacak huruf dalam font tulisan tangan agar terlihat
+                    natural. Ini menggunakan teknik "Quantum Contextual Alternates".</p>
+
+                <h3>Cara Menggunakan:</h3>
+                <ol style="margin-left: 20px; margin-top: 10px; display:flex; flex-direction:column; gap:8px;">
+                    <li><strong>1. Recipe List:</strong> Buka tab ke-4. Copy daftarnya. Paste di Glyphs App/FontLab
+                        untuk membuat glyph variasi (a.alt1, a.alt2, dst).</li>
+                    <li><strong>2. Classes:</strong> Copy tab 1 ke file fitur Anda. Ini mendefinisikan kelompok
+                        pengacakan.</li>
+                    <li><strong>3. Logic:</strong> Copy tab 2 ke fitur <code>calt</code>. Ini otak pengacakannya.</li>
+                    <li><strong>4. Safety:</strong> Copy tab 3 ke fitur <code>calt</code> (di baris paling akhir). Ini
+                        mencegah huruf kembar muncul berurutan.</li>
+                    <li><strong>5. Simulate:</strong> Gunakan tab ini untuk menguji hasil pengacakan secara visual.
+                        Indikator "tabrakan" menunjukkan jika ada karakter berurutan yang kebetulan mendapat alternate
+                        sama
+                        (ini normal dan akan diperbaiki otomatis oleh fitur Safety Check di font asli).</li>
+                </ol>
+
+                <h3>Tentang Indikator Tabrakan:</h3>
+                <p>Indikator "tabrakan berurutan" di tab Simulate adalah <strong>alat diagnostik</strong>, bukan error.
+                    Ini menunjukkan bahwa logika pengacakan (tab 2) menghasilkan pola yang bisa mengulang.
+                    Di font asli, fitur <strong>Safety Check</strong> (tab 3) akan otomatis mencegah pengulangan ini.
+                </p>
+
+                <h3>Penjelasan Parameter:</h3>
+                <ul style="margin-left: 20px; margin-top: 10px; display:flex; flex-direction:column; gap:8px;">
+                    <li><strong>Lookahead Depth (Kedalaman Konteks):</strong> Menentukan berapa karakter ke depan yang
+                        dianalisis untuk memilih alternate. Nilai lebih tinggi = pola lebih kompleks dan acak.
+                        Rekomendasi: 2-4.</li>
+                    <li><strong>Alternate Count (Jumlah Alternate):</strong> Berapa banyak variasi glyph yang Anda
+                        miliki
+                        untuk setiap karakter (misalnya: a, a.alt1, a.alt2, dst). Minimal 2, maksimal 8.</li>
+                    <li><strong>Bucket (Ember):</strong> Algoritma membagi semua karakter ke dalam kelompok-kelompok
+                        kecil.
+                        Setiap bucket mendapat nomor unik yang digunakan untuk menghitung alternate mana yang dipilih
+                        berdasarkan konteks.</li>
+                </ul>
+
+                <h3>Visualisasi Bucket:</h3>
+                <p style="font-size:0.9rem; color:#64748b; margin-bottom:10px;">
+                    Diagram ini menunjukkan bagaimana karakter Anda dibagi ke dalam bucket berdasarkan konfigurasi saat
+                    ini.
+                </p>
+                <div id="bucket-diagram"
+                    style="display:flex; flex-direction:column; gap:8px; padding:15px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+                    <!-- Diagram will be rendered here by JavaScript -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- Core Logic (Ported from React) ---
+        function shuffleAndBucket(glyphs, bucketCount) {
+            const shuffled = [...glyphs];
+            // Fisher-Yates Shuffle
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            // Bucket
+            const buckets = Array.from({ length: bucketCount }, () => []);
+            shuffled.forEach((glyph, index) => {
+                buckets[index % bucketCount].push(glyph);
+            });
+            return buckets;
+        }
+
+        function generateClasses(buckets, suffix, altCount) {
+            let output = "# Classes Definitions\n\n";
+            const getSuffix = (i) => `${suffix}${i}`;
+
+            buckets.forEach((bucket, bIndex) => {
+                const bucketNum = bIndex + 1;
+                output += `# Bucket ${bucketNum}\n`;
+                output += `@dflt_${bucketNum} = [${bucket.join(" ")}];\n`;
+                for (let i = 1; i <= altCount; i++) {
+                    const altGlyphs = bucket.map(g => `${g}${getSuffix(i)}`);
+                    output += `@alt${i}_${bucketNum} = [${altGlyphs.join(" ")}];\n`;
+                }
+                output += "\n";
+            });
+
+            output += `# ALL Classes Collections\n`;
+            output += `@dflt_ALL = [${buckets.map((_, i) => `@dflt_${i + 1}`).join(" ")}];\n`;
+            for (let i = 1; i <= altCount; i++) {
+                output += `@alt${i}_ALL = [${buckets.map((_, b) => `@alt${i}_${b + 1}`).join(" ")}];\n`;
+            }
+            output += `\n@ALL_ALL = [@dflt_ALL ${Array.from({ length: altCount }, (_, i) => `@alt${i + 1}_ALL`).join(" ")}];\n`;
+            return output;
+        }
+
+        function generatePseudoRandomLogic(buckets, steps, altCount) {
+            let output = "lookup PseudoRandom {\n  lookupflag IgnoreMarks;\n\n";
+            const bucketIndices = buckets.map((_, i) => i + 1);
+
+            function recurse(currentPath) {
+                if (currentPath.length === steps + 1) {
+                    const targetBucket = currentPath[0];
+                    const contextBuckets = currentPath.slice(1);
+                    const sum = currentPath.reduce((a, b) => a + b, 0);
+                    const noise = currentPath.reduce((acc, val, idx) => acc + (val * (idx + 2)), 0);
+                    let altIndex = (noise % altCount) + 1;
+
+                    const target = `@dflt_${targetBucket}'`;
+                    const context = contextBuckets.map(b => `@dflt_${b}`).join(" ");
+                    const result = `@alt${altIndex}_${targetBucket}`;
+                    output += `  sub ${target} ${context} by ${result};\n`;
+                    return;
+                }
+                for (const b of bucketIndices) {
+                    recurse([...currentPath, b]);
+                }
+            }
+
+            for (const b of bucketIndices) {
+                recurse([b]);
+            }
+            output += "} PseudoRandom;\n";
+            return output;
+        }
+
+        function generateBackwardsCheck(buckets, altCount) {
+            let output = "lookup BackwardsCheck {\n  lookupflag IgnoreMarks;\n\n";
+            const bucketIndices = buckets.map((_, i) => i + 1);
+
+            bucketIndices.forEach(b => {
+                output += `  sub @dflt_${b} @dflt_${b}' by @alt1_${b};\n`;
+                for (let i = 1; i < altCount; i++) {
+                    output += `  sub @alt${i}_${b} @alt${i}_${b}' by @alt${i + 1}_${b};\n`;
+                }
+                output += `  sub @alt${altCount}_${b} @alt${altCount}_${b}' by @dflt_${b};\n`;
+                output += "\n";
+            });
+            output += "} BackwardsCheck;\n";
+            return output;
+        }
+
+        function generateGlyphList(glyphs, suffix, altCount) {
+            // User requested space separated list for easier copy-pasting
+            const clean = [...new Set(glyphs)];
+            const getSuffix = (i) => `${suffix}${i}`;
+            const list = [];
+
+            clean.forEach(glyph => {
+                for (let i = 1; i <= altCount; i++) {
+                    list.push(`${glyph}${getSuffix(i)}`);
+                }
+            });
+            return list.join(" ");
+        }
+
+        function updateVisualizer() {
+            const text = document.getElementById('viz-input').value;
+            const outputDiv = document.getElementById('viz-output');
+            const statsDiv = document.getElementById('viz-stats');
+            if (state.activeTab !== 'visualizer') return;
+
+            const buckets = state.cachedBuckets;
+            if (!buckets || buckets.length === 0) return;
+
+            const charToBucket = {};
+            buckets.forEach((b, idx) => {
+                b.forEach(glyph => {
+                    charToBucket[glyph] = idx + 1;
+                });
+            });
+
+            let html = "";
+            let stats = { total: 0, randomized: 0, repeats: 0, safetyFixed: 0, prevChar: null, prevAlt: -1 };
+            const chars = text.split('');
+            const altColors = [
+                '#94a3b8', // 0 (Default)
+                '#ef4444', // 1
+                '#f97316', // 2
+                '#eab308', // 3
+                '#22c55e', // 4
+                '#06b6d4', // 5
+                '#3b82f6', // 6
+                '#8b5cf6', // 7
+                '#d946ef', // 8
+            ];
+
+            const steps = state.depth;
+            const altCount = state.altCount;
+
+            for (let i = 0; i < chars.length; i++) {
+                const char = chars[i];
+                stats.total++;
+
+                if (!charToBucket[char]) {
+                    html += `<span style="color:#cbd5e1">${char}</span>`;
+                    stats.prevChar = null;
+                    stats.prevAlt = -1;
+                    continue;
+                }
+
+                stats.randomized++;
+                const currentPath = [];
+                currentPath.push(charToBucket[char]);
+
+                let valid = true;
+                for (let k = 1; k <= steps; k++) {
+                    if (i + k < chars.length) {
+                        const nextChar = chars[i + k];
+                        const b = charToBucket[nextChar];
+                        if (b) currentPath.push(b);
+                        else { valid = false; break; }
+                    } else {
+                        valid = false; break;
+                    }
+                }
+
+                let altIndex = 0; // Default
+                if (valid && currentPath.length === steps + 1) {
+                    const noise = currentPath.reduce((acc, val, idx) => acc + (val * (idx + 2)), 0);
+                    altIndex = (noise % altCount) + 1;
+                }
+
+                // ===== SIMULATE BACKWARDSCHECK (Safety Check) =====
+                // If same character with same alternate as previous, cycle to next alternate
+                if (char === stats.prevChar && altIndex === stats.prevAlt && altIndex > 0) {
+                    stats.repeats++; // Count collision before fix
+                    altIndex = (altIndex % altCount) + 1; // Cycle to next alternate
+                    stats.safetyFixed++;
+                }
+
+                stats.prevChar = char;
+                stats.prevAlt = altIndex;
+
+                const color = altColors[altIndex] || altColors[0];
+                if (altIndex > 0) {
+                    html += `<span style="color:${color}; font-weight:bold;">${char}<sub style="font-size:0.5em; opacity:0.5">${altIndex}</sub></span>`;
+                } else {
+                    html += `<span style="color:${altColors[0]}">${char}</span>`;
+                }
+            }
+            outputDiv.innerHTML = html;
+
+            // Logic Indicator for User Verification
+            let statusColor = stats.safetyFixed === 0 ? '#166534' : '#0284c7';
+            let statusText = stats.safetyFixed === 0
+                ? 'Optimal (Tidak ada tabrakan)'
+                : `Safety Check aktif: ${stats.safetyFixed} tabrakan diperbaiki otomatis`;
+            if (stats.randomized < 2) statusText = "Ketik lebih banyak teks untuk memverifikasi logika...";
+
+            statsDiv.innerHTML = `<span style="font-weight:bold; color:${statusColor}">Status: ${statusText}</span> &bull; Dianalisis ${stats.total} karakter (${stats.randomized} diacak)`;
+        }
+
+        function loadFont(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const fontFace = new FontFace('CustomPreview', e.target.result);
+                fontFace.load().then(function (loadedFace) {
+                    document.fonts.add(loadedFace);
+                    document.getElementById('viz-output').style.fontFamily = '"CustomPreview", sans-serif';
+                    // Optional: reset input to allow reloading same file
+                    input.value = '';
+                }).catch(function (error) {
+                    console.error('Font loading failed:', error);
+                    alert('❌ Gagal memuat font!\n\nPastikan file yang Anda pilih adalah file font yang valid (.ttf atau .otf).');
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // --- UI Logic ---
+        const state = {
+            glyphs: document.getElementById('inputGlyphs').value,
+            altCount: 6,
+            suffix: '.alt',
+            bucketCount: 4,
+            depth: 3,
+            activeTab: 'classes',
+            results: {},
+            cachedBuckets: []
+        };
+
+        function update() {
+            // 1. Get Values
+            state.glyphs = document.getElementById('inputGlyphs').value;
+            state.altCount = parseInt(document.getElementById('inputAltCount').value) || 1;
+            state.suffix = document.getElementById('inputSuffix').value;
+            state.bucketCount = parseInt(document.getElementById('inputBucket').value);
+            state.depth = parseInt(document.getElementById('inputDepth').value);
+
+            // Update badges
+            document.getElementById('valBucket').textContent = state.bucketCount;
+            document.getElementById('valDepth').textContent = state.depth + ' steps';
+
+            // 2. Process
+            const cleanGlyphs = state.glyphs.replace(/[\n,]/g, ' ').split(' ').map(s => s.trim()).filter(Boolean);
+
+            // Re-shuffle on config change
+            const buckets = shuffleAndBucket(cleanGlyphs, state.bucketCount);
+            state.cachedBuckets = buckets;
+
+            state.results = {
+                classes: generateClasses(buckets, state.suffix, state.altCount),
+                calt: generatePseudoRandomLogic(buckets, state.depth, state.altCount),
+                check: generateBackwardsCheck(buckets, state.altCount),
+                recipe: generateGlyphList(cleanGlyphs, state.suffix, state.altCount)
+            };
+
+            // 3. Render
+            renderOutput();
+            if (state.activeTab === 'visualizer') updateVisualizer();
+        }
+
+        function renderOutput() {
+            if (state.activeTab === 'visualizer') {
+                document.getElementById('view-code').style.display = 'none';
+                document.getElementById('view-visualizer').style.display = 'flex';
+                updateVisualizer();
+            } else {
+                document.getElementById('view-code').style.display = 'flex';
+                document.getElementById('view-visualizer').style.display = 'none';
+
+                const code = state.results[state.activeTab] || '';
+                document.getElementById('output-code').textContent = code;
+
+                const titles = {
+                    classes: 'classes.fea',
+                    calt: 'calt.fea',
+                    check: 'BackwardsCheck.fea',
+                    recipe: 'recipe.txt',
+                    python: 'create_glyphs.py'
+                };
+                document.getElementById('filename-display').textContent = titles[state.activeTab];
+
+                // Show glyph count only for recipe tab
+                const glyphCountEl = document.getElementById('glyph-count');
+                if (state.activeTab === 'recipe' && code) {
+                    const glyphCount = code.trim().split(/\s+/).length;
+                    glyphCountEl.textContent = `Total: ${glyphCount} glyphs`;
+                    glyphCountEl.style.display = 'inline-block';
+                } else {
+                    glyphCountEl.style.display = 'none';
+                }
+            }
+        }
+
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + tabId).classList.add('active');
+            renderOutput();
+        }
+
+        function copyCode() {
+            const text = state.results[state.activeTab];
+            navigator.clipboard.writeText(text);
+            const btn = document.querySelectorAll('.copy-btn')[1];
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = 'Tersalin!';
+            setTimeout(() => btn.innerHTML = originalHTML, 1500);
+        }
+
+        function downloadCode() {
+            const text = state.results[state.activeTab];
+            const filename = document.getElementById('filename-display').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadAll() {
+            const content =
+                state.results.classes + "\n\n" +
+                state.results.calt + "\n\n" +
+                state.results.check;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "randomizer_complete.fea";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function renderBucketDiagram() {
+            const diagramEl = document.getElementById('bucket-diagram');
+            if (!diagramEl) return;
+
+            const buckets = state.cachedBuckets;
+            if (!buckets || buckets.length === 0) {
+                diagramEl.innerHTML = '<p style="color:#94a3b8; font-style:italic;">Belum ada data. Masukkan daftar glyph untuk melihat visualisasi.</p>';
+                return;
+            }
+
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef'];
+            let html = '';
+
+            buckets.forEach((bucket, index) => {
+                const color = colors[index % colors.length];
+                const bucketNum = index + 1;
+
+                html += `
+                    <div style="display:flex; align-items:start; gap:10px;">
+                        <div style="min-width:80px; font-weight:bold; color:${color}; background:${color}20; padding:6px 10px; border-radius:4px; text-align:center;">
+                            Bucket ${bucketNum}
+                        </div>
+                        <div style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+                            ${bucket.map(glyph => `<span style="background:#fff; border:1px solid ${color}; color:${color}; padding:3px 8px; border-radius:3px; font-size:0.85rem; font-family:monospace;">${glyph}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            diagramEl.innerHTML = html;
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('helpModal');
+            if (show) {
+                modal.classList.add('open');
+                renderBucketDiagram(); // Render diagram when modal opens
+            } else {
+                modal.classList.remove('open');
+            }
+        }
+
+        // Listeners
+        document.querySelectorAll('input, textarea').forEach(el => {
+            if (el.id === 'viz-input') {
+                el.addEventListener('input', updateVisualizer);
+            } else {
+                el.addEventListener('input', update);
+            }
+        });
+
+        // Initialize
+        update();
+    </script>
+</body>
+
+</html>
