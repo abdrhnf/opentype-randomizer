@@ -6,11 +6,11 @@ Generator fitur `calt` untuk memilih glyph alternatif berdasarkan huruf di sekit
 
 1. Masukkan **nama glyph dasar** yang ada di font, dipisahkan spasi. Contoh: `a b c A B C`.
 2. Tentukan jumlah **alternatif per glyph** dan akhiran namanya. Dengan nilai `2` dan akhiran `.alt`, Anda perlu membuat `a.alt1`, `a.alt2`, `b.alt1`, `b.alt2`, dan seterusnya.
-3. Buka **Daftar glyph** dan buat semua glyph yang tercantum di font editor.
+3. Lihat bagian **Daftar glyph alternatif** dan buat semua glyph yang tercantum di font editor.
 4. Di **Glyphs**, buka Font Info → Features → `calt`, klik **Salin untuk Glyphs**, tempel kode, lalu Compile. Jika sudah ada kode `calt`, periksa dan gabungkan isinya dulu. Untuk alur build berbasis berkas `.fea`, klik **Unduh .fea**; berkasnya memuat kelas, dua lookup, dan fitur `calt` lengkap.
 5. Kompilasi/ekspor font, aktifkan `calt`, lalu uji hasilnya di font editor atau aplikasi yang mendukung OpenType.
 
-Tab **Simulasi** hanya menampilkan pilihan alternatif dengan angka kecil. Bentuk glyph asli dan hasil kompilasi harus diperiksa di font yang sudah jadi. **Kode teknis** menampilkan bagian terpisah dari hasil salin dan unduhan untuk pemeriksaan.
+Bagian **Simulasi pilihan** hanya menampilkan alternatif terpilih dengan angka kecil. Bentuk glyph asli dan hasil kompilasi harus diperiksa di font yang sudah jadi. Buka **Kode .fea lengkap** untuk memeriksa isi berkas unduhan.
 
 Mengubah daftar glyph atau jumlah kelompok membuat pembagian kelompok baru. Perubahan jumlah alternatif dan akhiran nama mempertahankan pembagian yang sedang tampil.
 

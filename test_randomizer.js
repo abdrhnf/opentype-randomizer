@@ -27,15 +27,27 @@ const context = {
     Blob, Math, setTimeout
 };
 vm.runInNewContext(script, context);
-assert.equal(element('filename-display').textContent, 'recipe.txt');
-assert.equal(element('glyph-count').textContent, 'Total: 8 glyphs');
+assert.equal(element('glyph-count').textContent, '8 glyph');
+assert.match(element('output-code').textContent, /a\.alt1/);
+assert.match(element('output-fea').textContent, /feature calt \{/);
+assert.match(element('viz-output').innerHTML, /<sub/);
 context.downloadAll();
 assert.equal(downloaded, 'randomizer_calt.fea');
-Promise.all([context.blob.text(), context.copyGlyphsCode()]).then(([code]) => {
+Promise.all([context.blob.text(), context.copyGlyphsCode()]).then(async ([code]) => {
     assert.match(code, /feature calt \{\s+lookup PseudoRandom;\s+lookup BackwardsCheck;/);
     assert.match(code, /@alt2_1/);
     assert.match(clipboardText, /lookup PseudoRandom/);
     assert.doesNotMatch(clipboardText, /feature calt \{/);
+    await context.copyRecipe();
+    assert.match(clipboardText, /a\.alt1/);
+    await context.copyFeatureCode();
+    assert.match(clipboardText, /feature calt \{/);
+    element('inputBucket').value = '8';
+    context.update();
+    context.resetAdvanced();
+    assert.equal(element('inputBucket').value, 4);
+    assert.equal(element('inputDepth').value, 3);
+    assert.match(element('advanced-status').textContent, /aturan konteks/);
     element('inputGlyphs').value = '';
     context.update();
     assert.equal(element('copy-glyphs-code').disabled, true);

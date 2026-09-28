@@ -140,32 +140,31 @@
             margin-top: 0.25rem;
         }
 
-        .intro, .output-guide {
+        .intro {
             border-top: 1px solid var(--border);
             padding: 1rem 0 0;
             line-height: 1.5;
             font-size: 0.875rem;
         }
 
-        .output-guide { margin: 0 1.5rem; border: 0; border-bottom: 1px solid var(--border); padding: 1rem 0; }
-        .output-guide strong { display: block; margin-bottom: 0.25rem; }
-        .output-guide p { color: var(--text-muted); }
-
         .toolbar { flex-wrap: wrap; flex-shrink: 0; }
-        .toolbar .tab-btn { white-space: nowrap; flex-shrink: 0; height: 38px; padding: 0 0.75rem; }
         .toolbar .copy-btn { color: #fff; background: var(--primary); border: 1px solid var(--primary); border-radius: 8px; min-height: 38px; padding: 0 0.8rem; font-weight: 600; white-space: nowrap; }
         .toolbar .copy-btn:hover { background: var(--primary-hover); }
         .toolbar .secondary-action { color: var(--primary); background: #fff; border-color: var(--border); }
         .toolbar .secondary-action:hover { color: var(--primary); background: var(--bg); }
         button:disabled { cursor: not-allowed; opacity: 0.45; }
         #input-status[data-error="true"] { color: #a12622; font-weight: 600; }
-        .code-menu { position: relative; align-self: center; }
-        .code-menu summary { cursor: pointer; color: var(--text-muted); font-size: 0.875rem; list-style: none; border: 1px solid transparent; border-radius: 8px; min-height: 38px; padding: 0.5rem 0.75rem; }
-        .code-menu summary::after { content: ' ▾'; }
-        .code-menu summary:hover { background: var(--bg); color: var(--text-main); }
-        .code-menu[open] { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
-        .code-menu[open] summary { color: var(--primary); }
 
+        .advanced-settings { border-top: 1px solid var(--border); padding-top: 1rem; }
+        .advanced-settings summary, .feature-details summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; list-style: none; }
+        .advanced-settings summary::-webkit-details-marker, .feature-details summary::-webkit-details-marker { display: none; }
+        .advanced-settings summary span, .feature-details summary span { color: var(--text-muted); font-size: 0.75rem; }
+        .advanced-settings summary::after, .feature-details summary::after { content: '⌄'; color: var(--text-muted); }
+        .advanced-settings[open] summary::after, .feature-details[open] summary::after { content: '⌃'; }
+        .advanced-control { margin-top: 1.25rem; }
+        .advanced-control .range-header { align-items: center; }
+        .advanced-control label { margin-bottom: 0; }
+        .reset-btn { margin-top: 0.75rem; border: 0; background: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
         :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
         /* Main Content */
@@ -189,42 +188,32 @@
             align-items: center;
         }
 
-        .tab-btn {
-            background: none;
-            border: none;
-            height: 100%;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.875rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .toolbar-title { display: flex; flex-direction: column; gap: 0.15rem; }
+        .toolbar-title strong { font-size: 0.95rem; }
+        .toolbar-title span { color: var(--text-muted); font-size: 0.75rem; }
 
-        .tab-btn:hover {
-            color: var(--text-main);
-        }
+        .help-button { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-muted); cursor: pointer; }
+        .help-button:hover { background: var(--bg); }
 
-        .tab-btn.active {
-            color: var(--primary);
-            border-color: var(--border);
-            background: var(--bg);
-        }
-
-        .editor-container {
-            flex: 1;
-            padding: 1.5rem;
-            overflow: hidden;
-            display: flex;
-        }
+        .results-stack { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+        .section-heading h2 { font-size: 1rem; font-weight: 650; }
+        .section-heading p { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .count-badge { flex-shrink: 0; font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.5rem; }
+        .header-actions { display: flex; gap: 1rem; }
+        .result-section pre { max-height: 180px; }
+        .feature-details { border-top: 1px solid var(--border); padding-top: 1rem; }
+        .feature-details summary { margin-bottom: 0; }
+        .feature-details[open] summary { margin-bottom: 0.75rem; }
+        .feature-details pre { max-height: 360px; }
+        .viz-body { padding: 1rem; }
+        .viz-body label { margin-bottom: 0.5rem; }
+        .viz-body input { font-size: 1rem; background: var(--surface); }
+        #viz-output { min-height: 100px; margin-top: 0.75rem; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 1.5rem; line-height: 1.5; overflow-wrap: anywhere; }
 
         .code-window {
             background: var(--code-bg);
             border-radius: 0.75rem;
-            flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -259,7 +248,6 @@
         }
 
         pre {
-            flex: 1;
             overflow: auto;
             padding: 1rem;
             font-family: monospace;
@@ -351,8 +339,8 @@
                 min-height: 600px;
             }
             .toolbar { padding: 0.75rem; }
-            .output-guide { margin: 0 0.75rem; }
-            .editor-container { padding: 0.75rem; }
+            .results-stack { padding: 0.75rem; }
+            .section-heading { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -375,7 +363,7 @@
                         </svg>
                         Randomizer
                     </h1>
-                    <button class="tab-btn" onclick="toggleModal(true)" aria-label="Buka panduan" title="Panduan">?</button>
+                    <button class="help-button" onclick="toggleModal(true)" aria-label="Buka panduan" title="Panduan">?</button>
                 </div>
                 <p class="subtitle">Awal Studio · pembuat fitur calt</p>
             </header>
@@ -406,45 +394,39 @@
             </div>
             <p class="help-text" id="input-status" role="status" aria-live="polite"></p>
 
-            <details style="border-top: 1px solid var(--border); padding-top: 1rem;">
-                <summary>Pengaturan lanjutan</summary>
-                <div class="range-header">
-                    <label for="inputBucket">Jumlah kelompok glyph</label>
-                    <span class="range-badge" id="valBucket">4</span>
+            <details class="advanced-settings">
+                <summary>Pengaturan lanjutan <span>Opsional</span></summary>
+                <div class="advanced-control">
+                    <div class="range-header">
+                        <label for="inputBucket">Kelompok glyph</label>
+                        <span class="range-badge" id="valBucket">4</span>
+                    </div>
+                    <input type="range" id="inputBucket" min="2" max="8" value="4">
+                    <p class="help-text">Membagi glyph dasar untuk menentukan pola variasi.</p>
                 </div>
-                <input type="range" id="inputBucket" min="2" max="8" value="4">
-                <p class="help-text">Pengelompokan untuk memilih variasi berdasarkan huruf di sekitarnya.</p>
-
-                <div class="range-header">
-                    <label for="inputDepth">Jumlah huruf yang dilihat ke depan</label>
-                    <span class="range-badge" id="valDepth">3 huruf</span>
+                <div class="advanced-control">
+                    <div class="range-header">
+                        <label for="inputDepth">Konteks ke depan</label>
+                        <span class="range-badge" id="valDepth">3 huruf</span>
+                    </div>
+                    <input type="range" id="inputDepth" min="1" max="4" value="3">
+                    <p class="help-text">Berapa huruf berikutnya yang memengaruhi pilihan alternatif.</p>
                 </div>
-                <input type="range" id="inputDepth" min="1" max="4" value="3">
-                <p class="help-text">Nilai lebih besar menghasilkan lebih banyak aturan OpenType.</p>
+                <p class="help-text" id="advanced-status"></p>
+                <button type="button" class="reset-btn" onclick="resetAdvanced()">Kembalikan default</button>
             </details>
         </aside>
 
         <!-- MAIN -->
         <main>
             <div class="toolbar">
-                <button class="tab-btn active" onclick="switchTab('recipe')" id="btn-recipe">Daftar glyph</button>
-                <button class="tab-btn" onclick="switchTab('visualizer')" id="btn-visualizer">
-                    <svg class="icon" style="width:16px;height:16px;margin-right:5px;" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    Simulasi
-                </button>
-                <details class="code-menu">
-                    <summary>Kode teknis</summary>
-                    <button class="tab-btn" onclick="switchTab('classes')" id="btn-classes">Kelas</button>
-                    <button class="tab-btn" onclick="switchTab('calt')" id="btn-calt">Logika</button>
-                    <button class="tab-btn" onclick="switchTab('check')" id="btn-check">Cegah pengulangan</button>
-                </details>
+                <div class="toolbar-title">
+                    <strong>Hasil</strong>
+                    <span>Daftar glyph, simulasi, dan kode dalam satu halaman.</span>
+                </div>
                 <div style="margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <button class="copy-btn" id="copy-glyphs-code" onclick="copyGlyphsCode()" title="Salin kode untuk ditempel di fitur calt Glyphs">
-                        2 · Salin untuk Glyphs
+                        Salin untuk Glyphs
                     </button>
                     <button class="copy-btn secondary-action" id="download-all" onclick="downloadAll()" title="Unduh satu file fitur calt untuk alur build berbasis .fea">
                         <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
@@ -458,70 +440,55 @@
                 </div>
             </div>
 
-            <div class="output-guide" aria-live="polite">
-                <strong id="guide-title">1 · Buat glyph alternatif</strong>
-                <p id="guide-text">Buat semua glyph pada daftar ini di font editor. Setelah itu gunakan Salin untuk Glyphs atau Unduh .fea.</p>
-            </div>
-
-            <div class="editor-container">
-                <div class="code-window" id="view-code">
-                    <div class="code-header">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span id="filename-display">Daftar glyph · recipe.txt</span>
-                            <span id="glyph-count"
-                                style="font-size:0.75rem; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:6px;"></span>
-                        </div>
-                        <div style="display:flex; gap:12px;">
-                            <button class="copy-btn" id="download-code" onclick="downloadCode()" title="Unduh bagian ini">
-                                <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                                Unduh
-                            </button>
-                            <button class="copy-btn" id="copy-code" onclick="copyCode()">
-                                <svg class="icon" style="width:14px;height:14px;margin-right:5px;" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                                Salin
-                            </button>
-                        </div>
-                    </div>
-                    <pre id="output-code">Menyiapkan daftar...</pre>
-                </div>
-
-                <!-- Visualizer Window (Hidden by default) -->
-                <div class="code-window" id="view-visualizer" style="display:none; background: #fff;">
-                    <div class="code-header"
-                        style="background:var(--bg); color:var(--text-main); flex-direction: column; align-items: start; gap: 10px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <span>Simulasi pilihan alternatif</span>
-                        </div>
-                        <div id="viz-stats"
-                            style="width:100%; font-size:0.75rem; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:6px 8px; border-radius:6px;">
-                            Analisis: Menunggu input...
-                        </div>
-                    </div>
-                    <div
-                        style="padding: 1.5rem; display:flex; flex-direction:column; gap:1.5rem; height:100%; overflow:hidden;">
+            <div class="results-stack">
+                <section class="result-section" aria-labelledby="recipe-title">
+                    <header class="section-heading">
                         <div>
-                            <label for="viz-input">Teks contoh</label>
-                            <p class="help-text">Ini simulasi pilihan alternatif, bukan tampilan bentuk font asli.</p>
-                            <input type="text" id="viz-input" placeholder="Ketik di sini untuk menguji pengacakan..."
-                                style="width:100%; padding:1rem; font-size:1.2rem; border:1px solid var(--border); border-radius:8px;"
-                                value="abba cab de">
+                            <h2 id="recipe-title">1 · Buat glyph alternatif</h2>
+                            <p>Buat semua glyph pada daftar ini di font editor sebelum memasang fitur calt.</p>
                         </div>
-                        <div id="viz-output"
-                            style="flex:1; border:1px solid var(--border); border-radius:8px; padding:1.5rem; font-size:2rem; overflow:auto; line-height:1.5;">
-                            <!-- Output goes here -->
+                        <span id="glyph-count" class="count-badge"></span>
+                    </header>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span>recipe.txt</span>
+                            <div class="header-actions">
+                                <button class="copy-btn" id="download-code" onclick="downloadRecipe()">Unduh daftar</button>
+                                <button class="copy-btn" id="copy-code" onclick="copyRecipe()">Salin daftar</button>
+                            </div>
                         </div>
-                        <p class="help-text">Angka kecil adalah nomor alternatif. Tanpa angka berarti glyph dasar atau glyph yang tidak masuk daftar.</p>
+                        <pre id="output-code">Menyiapkan daftar...</pre>
                     </div>
-                </div>
+                </section>
+
+                <section class="result-section" aria-labelledby="sim-title">
+                    <header class="section-heading">
+                        <div>
+                            <h2 id="sim-title">2 · Simulasi pilihan</h2>
+                            <p>Angka kecil menunjukkan alternatif yang dipilih. Ini bukan tampilan bentuk font asli.</p>
+                        </div>
+                    </header>
+                    <div class="code-window" id="view-visualizer">
+                        <div class="viz-body">
+                            <label for="viz-input">Teks contoh</label>
+                            <input type="text" id="viz-input" placeholder="Ketik teks untuk simulasi" value="abba cab de">
+                            <div id="viz-output" aria-live="polite"></div>
+                            <p class="help-text">Tanpa angka berarti glyph dasar atau glyph yang tidak masuk daftar.</p>
+                            <p id="viz-stats" class="help-text"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <details class="feature-details">
+                    <summary><strong>3 · Kode .fea lengkap</strong><span>Lihat isi file sebelum diunduh</span></summary>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span>randomizer_calt.fea</span>
+                            <button class="copy-btn" id="copy-fea" onclick="copyFeatureCode()">Salin kode</button>
+                        </div>
+                        <pre id="output-fea"></pre>
+                    </div>
+                </details>
             </div>
         </main>
     </div>
@@ -542,10 +509,10 @@
                 <h3>Cara menggunakan:</h3>
                 <ol style="margin-left: 20px; margin-top: 10px; display:flex; flex-direction:column; gap:8px;">
                     <li>Isi nama glyph dasar dan jumlah alternatif yang akan dibuat untuk masing-masing glyph.</li>
-                    <li>Buka <strong>Daftar glyph</strong> dan buat semua glyph alternatif di font editor, misalnya <code>a.alt1</code> dan <code>a.alt2</code>.</li>
+                    <li>Buat semua glyph di bagian <strong>Daftar glyph alternatif</strong>, misalnya <code>a.alt1</code> dan <code>a.alt2</code>.</li>
                     <li>Untuk <strong>Glyphs</strong>, buka Font Info → Features → <code>calt</code>, klik <strong>Salin untuk Glyphs</strong> di halaman ini, tempel kode, lalu Compile. Jika font sudah punya kode <code>calt</code>, periksa dan gabungkan dengan hati-hati.</li>
                     <li>Untuk alur build berbasis file fitur, klik <strong>Unduh .fea</strong>. File ini memuat kelas, dua lookup, dan fitur <code>calt</code>.</li>
-                    <li>Aktifkan fitur <code>calt</code> saat menguji font hasil ekspor. Tab <strong>Simulasi</strong> hanya menunjukkan pilihan alternatif; bentuk glyph asli perlu diperiksa di font editor.</li>
+                    <li>Aktifkan fitur <code>calt</code> saat menguji font hasil ekspor. Bagian <strong>Simulasi pilihan</strong> hanya menunjukkan pilihan alternatif; bentuk glyph asli perlu diperiksa di font editor.</li>
                 </ol>
 
                 <h3>Tentang Indikator Tabrakan:</h3>
@@ -685,7 +652,6 @@
             const text = document.getElementById('viz-input').value;
             const outputDiv = document.getElementById('viz-output');
             const statsDiv = document.getElementById('viz-stats');
-            if (state.activeTab !== 'visualizer') return;
 
             const buckets = state.cachedBuckets;
             if (!buckets || buckets.length === 0) {
@@ -775,18 +741,9 @@
             suffix: '.alt',
             bucketCount: 4,
             depth: 3,
-            activeTab: 'recipe',
             results: {},
             cachedBuckets: [],
             bucketKey: ''
-        };
-
-        const guides = {
-            recipe: ['1 · Buat glyph alternatif', 'Buat semua glyph pada daftar ini di font editor. Lalu pilih Salin untuk Glyphs atau Unduh .fea.'],
-            classes: ['Kelas glyph', 'Bagian teknis yang mengelompokkan glyph dasar dan alternatif. Sudah termasuk dalam hasil salin dan unduhan.'],
-            calt: ['Logika pengacakan', 'Aturan yang memilih alternatif berdasarkan huruf berikutnya. Sudah termasuk dalam hasil salin dan unduhan.'],
-            check: ['Cegah pengulangan', 'Aturan akhir untuk menghindari alternatif yang sama pada huruf berulang. Sudah termasuk dalam hasil salin dan unduhan.'],
-            visualizer: ['3 · Simulasi aturan', 'Angka kecil menunjukkan alternatif terpilih. Simulasi ini belum menampilkan bentuk font Anda; cek hasil sebenarnya setelah fitur dikompilasi.']
         };
 
         function escapeHTML(value) {
@@ -811,7 +768,7 @@
             const status = document.getElementById('input-status');
             const valid = !!cleanGlyphs.length && !badGlyphs.length && /^[A-Za-z0-9_.-]+$/.test(state.suffix);
             status.dataset.error = String(!valid);
-            ['copy-glyphs-code', 'download-all', 'download-code', 'copy-code'].forEach(id => {
+            ['copy-glyphs-code', 'download-all', 'download-code', 'copy-code', 'copy-fea'].forEach(id => {
                 document.getElementById(id).disabled = !valid;
             });
             if (!valid) {
@@ -821,12 +778,15 @@
                 state.results = {};
                 state.cachedBuckets = [];
                 state.bucketKey = '';
+                document.getElementById('advanced-status').textContent = '';
                 renderOutput();
-                if (state.activeTab === 'visualizer') updateVisualizer();
+                updateVisualizer();
                 return;
             }
             const bucketCount = Math.min(state.bucketCount, cleanGlyphs.length);
             status.textContent = `${cleanGlyphs.length} glyph dasar · ${state.altCount} alternatif per glyph · ${bucketCount} kelompok. Perubahan langsung memperbarui hasil.`;
+            const ruleCount = bucketCount ** (state.depth + 1);
+            document.getElementById('advanced-status').textContent = `${ruleCount.toLocaleString('id-ID')} aturan konteks${ruleCount > 4096 ? ' · proses bisa lebih lambat' : ''}.`;
 
             // Keep the same grouping while editing unrelated settings.
             const bucketKey = JSON.stringify([cleanGlyphs, bucketCount]);
@@ -842,94 +802,57 @@
                 check: generateBackwardsCheck(buckets, state.altCount),
                 recipe: generateGlyphList(cleanGlyphs, state.suffix, state.altCount)
             };
+            state.results.code = featureCode() + "\n" +
+                "feature calt {\n  lookup PseudoRandom;\n  lookup BackwardsCheck;\n} calt;\n";
 
             // 3. Render
             renderOutput();
-            if (state.activeTab === 'visualizer') updateVisualizer();
+            updateVisualizer();
         }
 
         function renderOutput() {
-            const [title, explanation] = guides[state.activeTab];
-            document.getElementById('guide-title').textContent = title;
-            document.getElementById('guide-text').textContent = explanation;
-            if (state.activeTab === 'visualizer') {
-                document.getElementById('view-code').style.display = 'none';
-                document.getElementById('view-visualizer').style.display = 'flex';
-                updateVisualizer();
-            } else {
-                document.getElementById('view-code').style.display = 'flex';
-                document.getElementById('view-visualizer').style.display = 'none';
-
-                const code = state.results[state.activeTab] || '';
-                document.getElementById('output-code').textContent = code;
-
-                const titles = {
-                    classes: 'classes.fea',
-                    calt: 'calt.fea',
-                    check: 'BackwardsCheck.fea',
-                    recipe: 'recipe.txt',
-                };
-                document.getElementById('filename-display').textContent = titles[state.activeTab];
-
-                // Show glyph count only for recipe tab
-                const glyphCountEl = document.getElementById('glyph-count');
-                if (state.activeTab === 'recipe' && code) {
-                    const glyphCount = code.trim().split(/\s+/).length;
-                    glyphCountEl.textContent = `Total: ${glyphCount} glyphs`;
-                    glyphCountEl.style.display = 'inline-block';
-                } else {
-                    glyphCountEl.style.display = 'none';
-                }
-            }
+            const recipe = state.results.recipe || '';
+            document.getElementById('output-code').textContent = recipe;
+            document.getElementById('output-fea').textContent = state.results.code || '';
+            document.getElementById('glyph-count').textContent = recipe ? `${recipe.trim().split(/\s+/).length} glyph` : '0 glyph';
         }
 
-        function switchTab(tabId) {
-            state.activeTab = tabId;
-            document.querySelectorAll('.toolbar .tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + tabId).classList.add('active');
-            renderOutput();
+        function resetAdvanced() {
+            document.getElementById('inputBucket').value = 4;
+            document.getElementById('inputDepth').value = 3;
+            update();
         }
 
-        async function copyCode() {
-            const text = state.results[state.activeTab];
+        async function copyText(text, buttonId) {
             if (!text) return;
-            const btn = document.getElementById('copy-code');
-            const originalHTML = btn.innerHTML;
+            const btn = document.getElementById(buttonId);
+            const original = btn.textContent;
             try {
                 await navigator.clipboard.writeText(text);
                 btn.textContent = 'Tersalin!';
             } catch {
                 btn.textContent = 'Gagal menyalin';
             }
-            setTimeout(() => btn.innerHTML = originalHTML, 1500);
+            setTimeout(() => btn.textContent = original, 1500);
         }
+
+        function copyRecipe() { return copyText(state.results.recipe, 'copy-code'); }
+        function copyFeatureCode() { return copyText(state.results.code, 'copy-fea'); }
 
         function featureCode() {
             return state.results.classes + "\n" + state.results.calt + "\n" + state.results.check;
         }
 
-        async function copyGlyphsCode() {
-            if (!state.results.classes) return;
-            const btn = document.getElementById('copy-glyphs-code');
-            const original = btn.textContent;
-            try {
-                await navigator.clipboard.writeText(featureCode());
-                btn.textContent = 'Tersalin untuk Glyphs';
-            } catch {
-                btn.textContent = 'Gagal menyalin';
-            }
-            setTimeout(() => btn.textContent = original, 1500);
-        }
+        function copyGlyphsCode() { return copyText(state.results.classes && featureCode(), 'copy-glyphs-code'); }
 
-        function downloadCode() {
-            const text = state.results[state.activeTab];
+        function downloadRecipe() {
+            const text = state.results.recipe;
             if (!text) return;
-            const filename = document.getElementById('filename-display').textContent;
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = 'recipe.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -937,11 +860,8 @@
         }
 
         function downloadAll() {
-            if (!state.results.classes) return;
-            const content = featureCode() + "\n" +
-                "feature calt {\n  lookup PseudoRandom;\n  lookup BackwardsCheck;\n} calt;\n";
-
-            const blob = new Blob([content], { type: 'text/plain' });
+            if (!state.results.code) return;
+            const blob = new Blob([state.results.code], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
