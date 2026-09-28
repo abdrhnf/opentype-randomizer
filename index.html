@@ -155,12 +155,13 @@
         button:disabled { cursor: not-allowed; opacity: 0.45; }
         #input-status[data-error="true"] { color: #a12622; font-weight: 600; }
 
-        .advanced-settings { border-top: 1px solid var(--border); padding-top: 1rem; }
-        .advanced-settings summary, .feature-details summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; list-style: none; }
-        .advanced-settings summary::-webkit-details-marker, .feature-details summary::-webkit-details-marker { display: none; }
-        .advanced-settings summary span, .feature-details summary span { color: var(--text-muted); font-size: 0.75rem; }
-        .advanced-settings summary::after, .feature-details summary::after { content: '⌄'; color: var(--text-muted); }
-        .advanced-settings[open] summary::after, .feature-details[open] summary::after { content: '⌃'; }
+        .advanced-settings { position: relative; border-top: 1px solid var(--border); padding-top: 1rem; }
+        .advanced-settings[open] { z-index: 20; }
+        .advanced-settings summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; list-style: none; }
+        .advanced-settings summary::-webkit-details-marker { display: none; }
+        .advanced-settings summary::after { content: '⌄'; color: var(--text-muted); width: 1rem; text-align: center; }
+        .advanced-settings[open] summary::after { transform: rotate(180deg); }
+        .advanced-panel { position: absolute; top: calc(100% + 0.5rem); left: 0; width: 100%; max-height: min(60vh, 420px); overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 12px 24px rgba(32, 35, 32, 0.12); padding: 0 1rem 1rem; }
         .advanced-control { margin-top: 1.25rem; }
         .advanced-control .range-header { align-items: center; }
         .advanced-control label { margin-bottom: 0; }
@@ -202,10 +203,6 @@
         .count-badge { flex-shrink: 0; font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.5rem; }
         .header-actions { display: flex; gap: 1rem; }
         .result-section pre { max-height: 180px; }
-        .feature-details { border-top: 1px solid var(--border); padding-top: 1rem; }
-        .feature-details summary { margin-bottom: 0; }
-        .feature-details[open] summary { margin-bottom: 0.75rem; }
-        .feature-details pre { max-height: 360px; }
         .viz-body { padding: 1rem; }
         .viz-body label { margin-bottom: 0.5rem; }
         .viz-body input { font-size: 1rem; background: var(--surface); }
@@ -395,7 +392,8 @@
             <p class="help-text" id="input-status" role="status" aria-live="polite"></p>
 
             <details class="advanced-settings">
-                <summary>Pengaturan lanjutan <span>Opsional</span></summary>
+                <summary>Pengaturan lanjutan</summary>
+                <div class="advanced-panel">
                 <div class="advanced-control">
                     <div class="range-header">
                         <label for="inputBucket">Kelompok glyph</label>
@@ -414,6 +412,7 @@
                 </div>
                 <p class="help-text" id="advanced-status"></p>
                 <button type="button" class="reset-btn" onclick="resetAdvanced()">Kembalikan default</button>
+                </div>
             </details>
         </aside>
 
@@ -479,16 +478,6 @@
                     </div>
                 </section>
 
-                <details class="feature-details">
-                    <summary><strong>3 · Kode .fea lengkap</strong><span>Lihat isi file sebelum diunduh</span></summary>
-                    <div class="code-window">
-                        <div class="code-header">
-                            <span>randomizer_calt.fea</span>
-                            <button class="copy-btn" id="copy-fea" onclick="copyFeatureCode()">Salin kode</button>
-                        </div>
-                        <pre id="output-fea"></pre>
-                    </div>
-                </details>
             </div>
         </main>
     </div>
@@ -768,7 +757,7 @@
             const status = document.getElementById('input-status');
             const valid = !!cleanGlyphs.length && !badGlyphs.length && /^[A-Za-z0-9_.-]+$/.test(state.suffix);
             status.dataset.error = String(!valid);
-            ['copy-glyphs-code', 'download-all', 'download-code', 'copy-code', 'copy-fea'].forEach(id => {
+            ['copy-glyphs-code', 'download-all', 'download-code', 'copy-code'].forEach(id => {
                 document.getElementById(id).disabled = !valid;
             });
             if (!valid) {
@@ -813,7 +802,6 @@
         function renderOutput() {
             const recipe = state.results.recipe || '';
             document.getElementById('output-code').textContent = recipe;
-            document.getElementById('output-fea').textContent = state.results.code || '';
             document.getElementById('glyph-count').textContent = recipe ? `${recipe.trim().split(/\s+/).length} glyph` : '0 glyph';
         }
 
@@ -837,7 +825,6 @@
         }
 
         function copyRecipe() { return copyText(state.results.recipe, 'copy-code'); }
-        function copyFeatureCode() { return copyText(state.results.code, 'copy-fea'); }
 
         function featureCode() {
             return state.results.classes + "\n" + state.results.calt + "\n" + state.results.check;

@@ -29,7 +29,6 @@ const context = {
 vm.runInNewContext(script, context);
 assert.equal(element('glyph-count').textContent, '8 glyph');
 assert.match(element('output-code').textContent, /a\.alt1/);
-assert.match(element('output-fea').textContent, /feature calt \{/);
 assert.match(element('viz-output').innerHTML, /<sub/);
 context.downloadAll();
 assert.equal(downloaded, 'randomizer_calt.fea');
@@ -40,8 +39,6 @@ Promise.all([context.blob.text(), context.copyGlyphsCode()]).then(async ([code])
     assert.doesNotMatch(clipboardText, /feature calt \{/);
     await context.copyRecipe();
     assert.match(clipboardText, /a\.alt1/);
-    await context.copyFeatureCode();
-    assert.match(clipboardText, /feature calt \{/);
     element('inputBucket').value = '8';
     context.update();
     context.resetAdvanced();
