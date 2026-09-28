@@ -4,6 +4,8 @@
 
 OpenType Randomizer adalah alat standalone berbasis HTML untuk menghasilkan kode fitur OpenType (.fea) secara otomatis untuk efek pengacakan glyph pseudo-random. Alat ini dirancang khusus untuk font tulisan tangan yang membutuhkan variasi karakter agar terlihat lebih natural.
 
+Demo: https://abdrhnf.github.io/opentype-randomizer/
+
 ## Fitur Utama
 
 ### 1. Generator Kode OpenType
@@ -110,9 +112,9 @@ alternate_index = (noise % alternate_count) + 1
 
 ## Credits
 
-Dikembangkan untuk BahasaType
+Dikembangkan oleh Awal Studio
 Berdasarkan teknik yang digunakan di Playpen Sans
 
-## License
+## Status
 
-Private - BahasaType Internal Tool
+Demo dapat dibuka publik; repo pengembangannya tetap privat.
