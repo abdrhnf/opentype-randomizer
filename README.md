@@ -117,4 +117,4 @@ Berdasarkan teknik yang digunakan di Playpen Sans
 
 ## Status
 
-Demo dapat dibuka publik; repo pengembangannya tetap privat.
+Demo dan repo dapat dibuka publik. Penggunaan kode tidak disertai lisensi redistribusi.
